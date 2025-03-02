@@ -22,14 +22,14 @@
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: Memory.h 
+// FILE: Memory.h
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information					         
-//                Copyright (C); 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C); 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
@@ -45,27 +45,31 @@
 
 #pragma once
 
-#ifndef _GAME_MEMORY_H_ 
+#ifdef __GNUC__
+#define _cdecl __attribute__((__cdecl__))
+#endif
+
+#ifndef _GAME_MEMORY_H_
 #define _GAME_MEMORY_H_
 
 // Turn off memory pool checkpointing for now.
 #define DISABLE_MEMORYPOOL_CHECKPOINTING 1
 
 #if (defined(_DEBUG) || defined(_INTERNAL)) && !defined(MEMORYPOOL_DEBUG_CUSTOM_NEW) && !defined(DISABLE_MEMORYPOOL_DEBUG_CUSTOM_NEW)
-	#define MEMORYPOOL_DEBUG_CUSTOM_NEW
+#define MEMORYPOOL_DEBUG_CUSTOM_NEW
 #endif
 
-//#if (defined(_DEBUG) || defined(_INTERNAL)) && !defined(MEMORYPOOL_DEBUG) && !defined(DISABLE_MEMORYPOOL_DEBUG)
+// #if (defined(_DEBUG) || defined(_INTERNAL)) && !defined(MEMORYPOOL_DEBUG) && !defined(DISABLE_MEMORYPOOL_DEBUG)
 #if (defined(_DEBUG)) && !defined(MEMORYPOOL_DEBUG) && !defined(DISABLE_MEMORYPOOL_DEBUG)
-	#define MEMORYPOOL_DEBUG
+#define MEMORYPOOL_DEBUG
 #endif
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 
-#include <new.h>
+#include <new>
 #include <stdio.h>
 #ifdef MEMORYPOOL_OVERRIDE_MALLOC
-	#include <malloc.h>
+#include <malloc.h>
 #endif
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
@@ -78,130 +82,130 @@
 
 #ifdef MEMORYPOOL_DEBUG
 
-	// by default, enable free-block-retention for checkpointing in debug mode
-	#ifndef DISABLE_MEMORYPOOL_CHECKPOINTING
-		#define MEMORYPOOL_CHECKPOINTING
-	#endif
+// by default, enable free-block-retention for checkpointing in debug mode
+#ifndef DISABLE_MEMORYPOOL_CHECKPOINTING
+#define MEMORYPOOL_CHECKPOINTING
+#endif
 
-	// by default, enable bounding walls in debug mode (unless we have specifically disabled them)
-	#ifndef DISABLE_MEMORYPOOL_BOUNDINGWALL
-		#define MEMORYPOOL_BOUNDINGWALL
-	#endif
+// by default, enable bounding walls in debug mode (unless we have specifically disabled them)
+#ifndef DISABLE_MEMORYPOOL_BOUNDINGWALL
+#define MEMORYPOOL_BOUNDINGWALL
+#endif
 
-	#define DECLARE_LITERALSTRING_ARG1										const char * debugLiteralTagString
-	#define PASS_LITERALSTRING_ARG1												debugLiteralTagString
-	#define DECLARE_LITERALSTRING_ARG2										, const char * debugLiteralTagString
-	#define PASS_LITERALSTRING_ARG2												, debugLiteralTagString
+#define DECLARE_LITERALSTRING_ARG1 const char *debugLiteralTagString
+#define PASS_LITERALSTRING_ARG1 debugLiteralTagString
+#define DECLARE_LITERALSTRING_ARG2 , const char *debugLiteralTagString
+#define PASS_LITERALSTRING_ARG2 , debugLiteralTagString
 
-	#define MP_LOC_SUFFIX																/*" [" DEBUG_FILENLINE "]"*/
+#define MP_LOC_SUFFIX /*" [" DEBUG_FILENLINE "]"*/
 
-	#define allocateBlock(ARGLITERAL)										allocateBlockImplementation(ARGLITERAL MP_LOC_SUFFIX)
-	#define allocateBlockDoNotZero(ARGLITERAL)					allocateBlockDoNotZeroImplementation(ARGLITERAL MP_LOC_SUFFIX)
-	#define allocateBytes(ARGCOUNT,ARGLITERAL)					allocateBytesImplementation(ARGCOUNT, ARGLITERAL MP_LOC_SUFFIX)
-	#define allocateBytesDoNotZero(ARGCOUNT,ARGLITERAL)	allocateBytesDoNotZeroImplementation(ARGCOUNT, ARGLITERAL MP_LOC_SUFFIX)
-	#define newInstanceDesc(ARGCLASS,ARGLITERAL)				new(ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED, ARGLITERAL MP_LOC_SUFFIX) ARGCLASS
-	#define newInstance(ARGCLASS)												new(ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED, __FILE__) ARGCLASS
+#define allocateBlock(ARGLITERAL) allocateBlockImplementation(ARGLITERAL MP_LOC_SUFFIX)
+#define allocateBlockDoNotZero(ARGLITERAL) allocateBlockDoNotZeroImplementation(ARGLITERAL MP_LOC_SUFFIX)
+#define allocateBytes(ARGCOUNT, ARGLITERAL) allocateBytesImplementation(ARGCOUNT, ARGLITERAL MP_LOC_SUFFIX)
+#define allocateBytesDoNotZero(ARGCOUNT, ARGLITERAL) allocateBytesDoNotZeroImplementation(ARGCOUNT, ARGLITERAL MP_LOC_SUFFIX)
+#define newInstanceDesc(ARGCLASS, ARGLITERAL) new (ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED, ARGLITERAL MP_LOC_SUFFIX) ARGCLASS
+#define newInstance(ARGCLASS) new (ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED, __FILE__) ARGCLASS
 
-	#if !defined(MEMORYPOOL_STACKTRACE) && !defined(DISABLE_MEMORYPOOL_STACKTRACE)
-		#define MEMORYPOOL_STACKTRACE
-	#endif
+#if !defined(MEMORYPOOL_STACKTRACE) && !defined(DISABLE_MEMORYPOOL_STACKTRACE)
+#define MEMORYPOOL_STACKTRACE
+#endif
 
-	// flags for the memory-report options.
-	enum 
-	{
+// flags for the memory-report options.
+enum
+{
 
 #ifdef MEMORYPOOL_CHECKPOINTING
-		// ------------------------------------------------------
-		// you usually won't use the _REPORT bits directly; see below for more convenient combinations.
+	// ------------------------------------------------------
+	// you usually won't use the _REPORT bits directly; see below for more convenient combinations.
 
-		// you must set at least one of the 'allocate' bits.
-		_REPORT_CP_ALLOCATED_BEFORE			= 0x0001,
-		_REPORT_CP_ALLOCATED_BETWEEN		= 0x0002,
-		_REPORT_CP_ALLOCATED_DONTCARE		= (_REPORT_CP_ALLOCATED_BEFORE|_REPORT_CP_ALLOCATED_BETWEEN),
+	// you must set at least one of the 'allocate' bits.
+	_REPORT_CP_ALLOCATED_BEFORE = 0x0001,
+	_REPORT_CP_ALLOCATED_BETWEEN = 0x0002,
+	_REPORT_CP_ALLOCATED_DONTCARE = (_REPORT_CP_ALLOCATED_BEFORE | _REPORT_CP_ALLOCATED_BETWEEN),
 
-		// you must set at least one of the 'freed' bits.
-		_REPORT_CP_FREED_BEFORE					= 0x0010,
-		_REPORT_CP_FREED_BETWEEN				= 0x0020,
-		_REPORT_CP_FREED_NEVER					= 0x0040,	// ie, still in existence
-		_REPORT_CP_FREED_DONTCARE				= (_REPORT_CP_FREED_BEFORE|_REPORT_CP_FREED_BETWEEN|_REPORT_CP_FREED_NEVER),
-		// ------------------------------------------------------
+	// you must set at least one of the 'freed' bits.
+	_REPORT_CP_FREED_BEFORE = 0x0010,
+	_REPORT_CP_FREED_BETWEEN = 0x0020,
+	_REPORT_CP_FREED_NEVER = 0x0040, // ie, still in existence
+	_REPORT_CP_FREED_DONTCARE = (_REPORT_CP_FREED_BEFORE | _REPORT_CP_FREED_BETWEEN | _REPORT_CP_FREED_NEVER),
+// ------------------------------------------------------
 #endif // MEMORYPOOL_CHECKPOINTING
 
 #ifdef MEMORYPOOL_STACKTRACE
-		/** display the stacktrace for allocation location for all blocks found. 
-			this bit may be mixed-n-matched with any other flag.
-		*/
-		REPORT_CP_STACKTRACE		= 0x0100,
+	/** display the stacktrace for allocation location for all blocks found.
+		this bit may be mixed-n-matched with any other flag.
+	*/
+	REPORT_CP_STACKTRACE = 0x0100,
 #endif
-		
-		/** display stats for each pool, in addition to each block.
-			(this is useful for finding suitable allocation counts for the pools.)
-			this bit may be mixed-n-matched with any other flag.
-		*/
-		REPORT_POOLINFO					= 0x0200, 
 
-		/** report on the overall memory situation (including all pools and dma's).
-			this bit may be mixed-n-matched with any other flag.
-		*/
-		REPORT_FACTORYINFO			= 0x0400,	
+	/** display stats for each pool, in addition to each block.
+		(this is useful for finding suitable allocation counts for the pools.)
+		this bit may be mixed-n-matched with any other flag.
+	*/
+	REPORT_POOLINFO = 0x0200,
 
-		/** report on pools that have overflowed their initial allocation.
-			this bit may be mixed-n-matched with any other flag.
-		*/
-		REPORT_POOL_OVERFLOW		= 0x0800,	
+	/** report on the overall memory situation (including all pools and dma's).
+		this bit may be mixed-n-matched with any other flag.
+	*/
+	REPORT_FACTORYINFO = 0x0400,
 
-		/** simple-n-cheap leak checking */
-		REPORT_SIMPLE_LEAKS			= 0x1000,
+	/** report on pools that have overflowed their initial allocation.
+		this bit may be mixed-n-matched with any other flag.
+	*/
+	REPORT_POOL_OVERFLOW = 0x0800,
+
+	/** simple-n-cheap leak checking */
+	REPORT_SIMPLE_LEAKS = 0x1000,
 
 #ifdef MEMORYPOOL_CHECKPOINTING
-		/** report on blocks that were allocated between the checkpoints.
-		 (don't care if they were freed or not.)
-		*/
-		REPORT_CP_ALLOCATES	= (_REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_DONTCARE),	
+	/** report on blocks that were allocated between the checkpoints.
+	 (don't care if they were freed or not.)
+	*/
+	REPORT_CP_ALLOCATES = (_REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_DONTCARE),
 
-		/** report on blocks that were freed between the checkpoints.
-		 (don't care when they were allocated.)
-		*/
-		REPORT_CP_FREES			= (_REPORT_CP_ALLOCATED_DONTCARE | _REPORT_CP_FREED_BETWEEN),	
+	/** report on blocks that were freed between the checkpoints.
+	 (don't care when they were allocated.)
+	*/
+	REPORT_CP_FREES = (_REPORT_CP_ALLOCATED_DONTCARE | _REPORT_CP_FREED_BETWEEN),
 
-		/** report on blocks that were allocated between the checkpoints, and still exist
-		 (note that this reports *potential* leaks -- some such blocks may be desired)
-		*/
-		REPORT_CP_LEAKS			= (_REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_NEVER),
+	/** report on blocks that were allocated between the checkpoints, and still exist
+	 (note that this reports *potential* leaks -- some such blocks may be desired)
+	*/
+	REPORT_CP_LEAKS = (_REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_NEVER),
 
-		/** report on blocks that existed before checkpoint #1 and still exist now.
-		*/
-		REPORT_CP_LONGTERM		= (_REPORT_CP_ALLOCATED_BEFORE | _REPORT_CP_FREED_NEVER),
-		
-		/** report on blocks that were allocated-and-freed between the checkpoints.
-		*/
-		REPORT_CP_TRANSIENT		= (_REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_BETWEEN),
+	/** report on blocks that existed before checkpoint #1 and still exist now.
+	 */
+	REPORT_CP_LONGTERM = (_REPORT_CP_ALLOCATED_BEFORE | _REPORT_CP_FREED_NEVER),
 
-		/** report on all blocks that currently exist
-		*/
-		REPORT_CP_EXISTING		= (_REPORT_CP_ALLOCATED_BEFORE | _REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_NEVER),
+	/** report on blocks that were allocated-and-freed between the checkpoints.
+	 */
+	REPORT_CP_TRANSIENT = (_REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_BETWEEN),
 
-		/** report on all blocks that have ever existed (!) (or at least, since the last call
-			to debugResetCheckpoints)
-		*/
-		REPORT_CP_ALL					= (_REPORT_CP_ALLOCATED_DONTCARE | _REPORT_CP_FREED_DONTCARE)
+	/** report on all blocks that currently exist
+	 */
+	REPORT_CP_EXISTING = (_REPORT_CP_ALLOCATED_BEFORE | _REPORT_CP_ALLOCATED_BETWEEN | _REPORT_CP_FREED_NEVER),
+
+	/** report on all blocks that have ever existed (!) (or at least, since the last call
+		to debugResetCheckpoints)
+	*/
+	REPORT_CP_ALL = (_REPORT_CP_ALLOCATED_DONTCARE | _REPORT_CP_FREED_DONTCARE)
 #endif // MEMORYPOOL_CHECKPOINTING
-		
-	};
+
+};
 
 #else
 
-	#define DECLARE_LITERALSTRING_ARG1
-	#define PASS_LITERALSTRING_ARG1	
-	#define DECLARE_LITERALSTRING_ARG2
-	#define PASS_LITERALSTRING_ARG2
+#define DECLARE_LITERALSTRING_ARG1
+#define PASS_LITERALSTRING_ARG1
+#define DECLARE_LITERALSTRING_ARG2
+#define PASS_LITERALSTRING_ARG2
 
-	#define allocateBlock(ARGLITERAL)										allocateBlockImplementation()
-	#define allocateBlockDoNotZero(ARGLITERAL)					allocateBlockDoNotZeroImplementation()
-	#define allocateBytes(ARGCOUNT,ARGLITERAL)					allocateBytesImplementation(ARGCOUNT)
-	#define allocateBytesDoNotZero(ARGCOUNT,ARGLITERAL)	allocateBytesDoNotZeroImplementation(ARGCOUNT)
-	#define newInstanceDesc(ARGCLASS,ARGLITERAL)				new(ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED) ARGCLASS
-	#define newInstance(ARGCLASS)												new(ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED) ARGCLASS
+#define allocateBlock(ARGLITERAL) allocateBlockImplementation()
+#define allocateBlockDoNotZero(ARGLITERAL) allocateBlockDoNotZeroImplementation()
+#define allocateBytes(ARGCOUNT, ARGLITERAL) allocateBytesImplementation(ARGCOUNT)
+#define allocateBytesDoNotZero(ARGCOUNT, ARGLITERAL) allocateBytesDoNotZeroImplementation(ARGCOUNT)
+#define newInstanceDesc(ARGCLASS, ARGLITERAL) new (ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED) ARGCLASS
+#define newInstance(ARGCLASS) new (ARGCLASS::ARGCLASS##_GLUE_NOT_IMPLEMENTED) ARGCLASS
 
 #endif
 
@@ -225,15 +229,15 @@ class BlockCheckpointInfo;
 */
 struct PoolInitRec
 {
-	const char *poolName;					///< name of the pool; by convention, "dmaPool_XXX" where XXX is allocationSize
-	Int allocationSize;						///< size, in bytes, of the pool.
-	Int initialAllocationCount;		///< initial number of blocks to allocate.
-	Int overflowAllocationCount;	///< when the pool runs out of space, allocate more blocks in this increment
+	const char *poolName;		 ///< name of the pool; by convention, "dmaPool_XXX" where XXX is allocationSize
+	Int allocationSize;			 ///< size, in bytes, of the pool.
+	Int initialAllocationCount;	 ///< initial number of blocks to allocate.
+	Int overflowAllocationCount; ///< when the pool runs out of space, allocate more blocks in this increment
 };
 
-enum 
+enum
 {
-	MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS = 8	///< The max number of subpools allowed in a DynamicMemoryAllocator
+	MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS = 8 ///< The max number of subpools allowed in a DynamicMemoryAllocator
 };
 
 #ifdef MEMORYPOOL_CHECKPOINTING
@@ -246,11 +250,10 @@ enum
 class Checkpointable
 {
 private:
-	BlockCheckpointInfo	*m_firstCheckpointInfo;		///< head of the linked list of checkpoint infos for this pool/dma
-	Bool								m_cpiEverFailed;					///< flag to detect if we ran out of memory accumulating checkpoint info.
+	BlockCheckpointInfo *m_firstCheckpointInfo; ///< head of the linked list of checkpoint infos for this pool/dma
+	Bool m_cpiEverFailed;						///< flag to detect if we ran out of memory accumulating checkpoint info.
 
 protected:
-
 	Checkpointable();
 	~Checkpointable();
 
@@ -258,8 +261,7 @@ protected:
 	BlockCheckpointInfo *debugAddCheckpointInfo(
 		const char *debugLiteralTagString,
 		Int allocCheckpoint,
-		Int blockSize
-	);
+		Int blockSize);
 
 public:
 	/// dump a checkpoint report to logfile
@@ -277,51 +279,48 @@ public:
 	additional blobs as necessary. A given pool can allocate blocks of only one size;
 	if you need a different size, you should use a different pool.
 */
-class MemoryPool 
+class MemoryPool
 #ifdef MEMORYPOOL_CHECKPOINTING
 	: public Checkpointable
 #endif
 {
 private:
-
-	MemoryPoolFactory	*m_factory;									///< the factory that created us
-	MemoryPool				*m_nextPoolInFactory;				///< linked list node, managed by factory
-	const char				*m_poolName;								///< name of this pool. (literal string; must not be freed)
-	Int								m_allocationSize;						///< size of the blocks allocated by this pool, in bytes
-	Int								m_initialAllocationCount;		///< number of blocks to be allocated in initial blob
-	Int								m_overflowAllocationCount;	///< number of blocks to be allocated in any subsequent blob(s)
-	Int								m_usedBlocksInPool;					///< total number of blocks in use in the pool.
-	Int								m_totalBlocksInPool;				///< total number of blocks in all blobs of this pool (used or not).
-	Int								m_peakUsedBlocksInPool;			///< high-water mark of m_usedBlocksInPool
-	MemoryPoolBlob		*m_firstBlob;								///< head of linked list: first blob for this pool.
-	MemoryPoolBlob		*m_lastBlob;								///< tail of linked list: last blob for this pool. (needed for efficiency)
-	MemoryPoolBlob		*m_firstBlobWithFreeBlocks;	///< first blob in this pool that has at least one unallocated block.
+	MemoryPoolFactory *m_factory;			   ///< the factory that created us
+	MemoryPool *m_nextPoolInFactory;		   ///< linked list node, managed by factory
+	const char *m_poolName;					   ///< name of this pool. (literal string; must not be freed)
+	Int m_allocationSize;					   ///< size of the blocks allocated by this pool, in bytes
+	Int m_initialAllocationCount;			   ///< number of blocks to be allocated in initial blob
+	Int m_overflowAllocationCount;			   ///< number of blocks to be allocated in any subsequent blob(s)
+	Int m_usedBlocksInPool;					   ///< total number of blocks in use in the pool.
+	Int m_totalBlocksInPool;				   ///< total number of blocks in all blobs of this pool (used or not).
+	Int m_peakUsedBlocksInPool;				   ///< high-water mark of m_usedBlocksInPool
+	MemoryPoolBlob *m_firstBlob;			   ///< head of linked list: first blob for this pool.
+	MemoryPoolBlob *m_lastBlob;				   ///< tail of linked list: last blob for this pool. (needed for efficiency)
+	MemoryPoolBlob *m_firstBlobWithFreeBlocks; ///< first blob in this pool that has at least one unallocated block.
 
 private:
 	/// create a new blob with the given number of blocks.
-	MemoryPoolBlob* createBlob(Int allocationCount);
+	MemoryPoolBlob *createBlob(Int allocationCount);
 
 	/// destroy a blob.
 	Int freeBlob(MemoryPoolBlob *blob);
 
 public:
-
 	// 'public' funcs that are really only for use by MemoryPoolFactory
-	MemoryPool *getNextPoolInList();					///< return next pool in linked list
-	void addToList(MemoryPool **pHead);				///< add this pool to head of the linked list
-	void removeFromList(MemoryPool **pHead);	///< remove this pool from the linked list
-	#ifdef MEMORYPOOL_DEBUG
-		static void debugPoolInfoReport( MemoryPool *pool, FILE *fp = NULL );	///< dump a report about this pool to the logfile
-		const char *debugGetBlockTagString(void *pBlock);		///< return the tagstring for the given block (assumed to belong to this pool)
-		void debugMemoryVerifyPool();												///< perform internal consistency check on this pool.
-		Int debugPoolReportLeaks( const char* owner );
-	#endif
-	#ifdef MEMORYPOOL_CHECKPOINTING
-		void debugResetCheckpoints();												///< throw away all checkpoint information for this pool.
-	#endif
+	MemoryPool *getNextPoolInList();		 ///< return next pool in linked list
+	void addToList(MemoryPool **pHead);		 ///< add this pool to head of the linked list
+	void removeFromList(MemoryPool **pHead); ///< remove this pool from the linked list
+#ifdef MEMORYPOOL_DEBUG
+	static void debugPoolInfoReport(MemoryPool *pool, FILE *fp = NULL); ///< dump a report about this pool to the logfile
+	const char *debugGetBlockTagString(void *pBlock);					///< return the tagstring for the given block (assumed to belong to this pool)
+	void debugMemoryVerifyPool();										///< perform internal consistency check on this pool.
+	Int debugPoolReportLeaks(const char *owner);
+#endif
+#ifdef MEMORYPOOL_CHECKPOINTING
+	void debugResetCheckpoints(); ///< throw away all checkpoint information for this pool.
+#endif
 
 public:
-
 	MemoryPool();
 
 	/// initialize the given memory pool.
@@ -334,7 +333,7 @@ public:
 
 	/// same as allocateBlockImplementation, but memory returned is not zeroed
 	void *allocateBlockDoNotZeroImplementation(DECLARE_LITERALSTRING_ARG1);
-	
+
 	/// free the block. it is OK to pass null.
 	void freeBlock(void *pMem);
 
@@ -370,10 +369,10 @@ public:
 	/// destroy all blocks and blobs in this pool.
 	void reset();
 
-	#ifdef MEMORYPOOL_DEBUG
-		/// return true iff this block was allocated by this pool.
-		Bool debugIsBlockInPool(void *pBlock);
-	#endif
+#ifdef MEMORYPOOL_DEBUG
+	/// return true iff this block was allocated by this pool.
+	Bool debugIsBlockInPool(void *pBlock);
+#endif
 };
 
 // ----------------------------------------------------------------------------
@@ -384,47 +383,45 @@ public:
 	(Requests too large for any of the pool are routed to the system memory allocator.)
 	You should normally use this in place of malloc/free or (global) new/delete.
 */
-class DynamicMemoryAllocator 
+class DynamicMemoryAllocator
 #ifdef MEMORYPOOL_CHECKPOINTING
 	: public Checkpointable
 #endif
 {
 private:
-	MemoryPoolFactory					*m_factory;						///< the factory that created us
-	DynamicMemoryAllocator		*m_nextDmaInFactory;	///< linked list node, managed by factory
-	Int												m_numPools;						///< number of subpools (up to MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS)
-	Int												m_usedBlocksInDma;		///< total number of blocks allocated, from subpools and "raw"
-	MemoryPool								*m_pools[MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS];	///< the subpools
-	MemoryPoolSingleBlock			*m_rawBlocks;					///< linked list of "raw" blocks allocated directly from system
+	MemoryPoolFactory *m_factory;							  ///< the factory that created us
+	DynamicMemoryAllocator *m_nextDmaInFactory;				  ///< linked list node, managed by factory
+	Int m_numPools;											  ///< number of subpools (up to MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS)
+	Int m_usedBlocksInDma;									  ///< total number of blocks allocated, from subpools and "raw"
+	MemoryPool *m_pools[MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS]; ///< the subpools
+	MemoryPoolSingleBlock *m_rawBlocks;						  ///< linked list of "raw" blocks allocated directly from system
 
 	/// return the best pool for the given allocSize, or null if none are suitable
 	MemoryPool *findPoolForSize(Int allocSize);
 
 public:
-
 	// 'public' funcs that are really only for use by MemoryPoolFactory
 
-	DynamicMemoryAllocator *getNextDmaInList();						///< return next dma in linked list
-	void addToList(DynamicMemoryAllocator **pHead);				///< add this dma to the list
-	void removeFromList(DynamicMemoryAllocator **pHead);	///< remove this dma from the list
-	#ifdef MEMORYPOOL_DEBUG
-		Int debugCalcRawBlockBytes(Int *numBlocks);												///< calculate the number of bytes in "raw" (non-subpool) blocks
-		void debugMemoryVerifyDma();												///< perform internal consistency check
-		const char *debugGetBlockTagString(void *pBlock);		///< return the tagstring for the given block (assumed to belong to this dma)
-		void debugDmaInfoReport( FILE *fp = NULL );					///< dump a report about this pool to the logfile
-		Int debugDmaReportLeaks();
-	#endif
-	#ifdef MEMORYPOOL_CHECKPOINTING
-		void debugResetCheckpoints();												///< toss all checkpoint information
-	#endif
+	DynamicMemoryAllocator *getNextDmaInList();			 ///< return next dma in linked list
+	void addToList(DynamicMemoryAllocator **pHead);		 ///< add this dma to the list
+	void removeFromList(DynamicMemoryAllocator **pHead); ///< remove this dma from the list
+#ifdef MEMORYPOOL_DEBUG
+	Int debugCalcRawBlockBytes(Int *numBlocks);		  ///< calculate the number of bytes in "raw" (non-subpool) blocks
+	void debugMemoryVerifyDma();					  ///< perform internal consistency check
+	const char *debugGetBlockTagString(void *pBlock); ///< return the tagstring for the given block (assumed to belong to this dma)
+	void debugDmaInfoReport(FILE *fp = NULL);		  ///< dump a report about this pool to the logfile
+	Int debugDmaReportLeaks();
+#endif
+#ifdef MEMORYPOOL_CHECKPOINTING
+	void debugResetCheckpoints(); ///< toss all checkpoint information
+#endif
 
 public:
-
 	DynamicMemoryAllocator();
 
 	/// initialize the dma. pass 0/null for numSubPool/parms to get some reasonable default subpools.
 	void init(MemoryPoolFactory *factory, Int numSubPools, const PoolInitRec pParms[]);
-	
+
 	~DynamicMemoryAllocator();
 
 	/// allocate bytes from this pool. (don't call directly; use allocateBytes() macro)
@@ -434,14 +431,14 @@ public:
 	void *allocateBytesDoNotZeroImplementation(Int numBytes DECLARE_LITERALSTRING_ARG2);
 
 #ifdef MEMORYPOOL_DEBUG
-	void debugIgnoreLeaksForThisBlock(void* pBlockPtr);
+	void debugIgnoreLeaksForThisBlock(void *pBlockPtr);
 #endif
 
 	/// free the bytes. (assumes allocated by this dma.)
-	void freeBytes(void* pMem);
+	void freeBytes(void *pMem);
 
 	/**
-		return the actual number of bytes that would be allocated 
+		return the actual number of bytes that would be allocated
 		if you tried to allocate the given size. (It will generally be slightly
 		larger than you request.) This lets you use extra space if you're gonna get it anyway...
 		The idea is that you will call this before doing a memory allocation, to see if
@@ -453,22 +450,25 @@ public:
 	void reset();
 
 	Int getDmaMemoryPoolCount() const { return m_numPools; }
-	MemoryPool* getNthDmaMemoryPool(Int i) const { return m_pools[i]; }
+	MemoryPool *getNthDmaMemoryPool(Int i) const { return m_pools[i]; }
 
-	#ifdef MEMORYPOOL_DEBUG
+#ifdef MEMORYPOOL_DEBUG
 
-		/// return true iff this block was allocated by this dma
-		Bool debugIsBlockInDma(void *pBlock);
+	/// return true iff this block was allocated by this dma
+	Bool debugIsBlockInDma(void *pBlock);
 
-		/// return true iff the pool is a subpool of this dma
-		Bool debugIsPoolInDma(MemoryPool *pool);
+	/// return true iff the pool is a subpool of this dma
+	Bool debugIsPoolInDma(MemoryPool *pool);
 
-	#endif	// MEMORYPOOL_DEBUG
+#endif // MEMORYPOOL_DEBUG
 };
 
 // ----------------------------------------------------------------------------
 #ifdef MEMORYPOOL_DEBUG
-enum { MAX_SPECIAL_USED = 256 };
+enum
+{
+	MAX_SPECIAL_USED = 256
+};
 #endif
 
 // ----------------------------------------------------------------------------
@@ -480,36 +480,34 @@ enum { MAX_SPECIAL_USED = 256 };
 class MemoryPoolFactory
 {
 private:
-	MemoryPool								*m_firstPoolInFactory;		///< linked list of pools
-	DynamicMemoryAllocator		*m_firstDmaInFactory;			///< linked list of dmas
+	MemoryPool *m_firstPoolInFactory;			 ///< linked list of pools
+	DynamicMemoryAllocator *m_firstDmaInFactory; ///< linked list of dmas
 #ifdef MEMORYPOOL_CHECKPOINTING
-	Int												m_curCheckpoint;					///< most recent checkpoint value
+	Int m_curCheckpoint; ///< most recent checkpoint value
 #endif
 #ifdef MEMORYPOOL_DEBUG
-	Int												m_usedBytes;							///< total bytes in use
-	Int												m_physBytes;							///< total bytes allocated to all pools (includes unused blocks)
-	Int												m_peakUsedBytes;					///< high-water mark of m_usedBytes
-	Int												m_peakPhysBytes;					///< high-water mark of m_physBytes
-	Int												m_usedBytesSpecial[MAX_SPECIAL_USED];
-	Int												m_usedBytesSpecialPeak[MAX_SPECIAL_USED];
-	Int												m_physBytesSpecial[MAX_SPECIAL_USED];
-	Int												m_physBytesSpecialPeak[MAX_SPECIAL_USED];
+	Int m_usedBytes;	 ///< total bytes in use
+	Int m_physBytes;	 ///< total bytes allocated to all pools (includes unused blocks)
+	Int m_peakUsedBytes; ///< high-water mark of m_usedBytes
+	Int m_peakPhysBytes; ///< high-water mark of m_physBytes
+	Int m_usedBytesSpecial[MAX_SPECIAL_USED];
+	Int m_usedBytesSpecialPeak[MAX_SPECIAL_USED];
+	Int m_physBytesSpecial[MAX_SPECIAL_USED];
+	Int m_physBytesSpecialPeak[MAX_SPECIAL_USED];
 #endif
 
 public:
-
-		// 'public' funcs that are really only for use by MemoryPool and friends
-	#ifdef MEMORYPOOL_DEBUG
-		/// adjust the usedBytes and physBytes variables by the given amoun ts.
-		void adjustTotals(const char* tagString, Int usedDelta, Int physDelta);
-	#endif
-	#ifdef MEMORYPOOL_CHECKPOINTING
-		/// return the current checkpoint value.
-		Int getCurCheckpoint() { return m_curCheckpoint; }
-	#endif
+	// 'public' funcs that are really only for use by MemoryPool and friends
+#ifdef MEMORYPOOL_DEBUG
+	/// adjust the usedBytes and physBytes variables by the given amoun ts.
+	void adjustTotals(const char *tagString, Int usedDelta, Int physDelta);
+#endif
+#ifdef MEMORYPOOL_CHECKPOINTING
+	/// return the current checkpoint value.
+	Int getCurCheckpoint() { return m_curCheckpoint; }
+#endif
 
 public:
-	
 	MemoryPoolFactory();
 	void init();
 	~MemoryPoolFactory();
@@ -519,7 +517,7 @@ public:
 
 	/// overloaded version of createMemoryPool with explicit parms.
 	MemoryPool *createMemoryPool(const char *poolName, Int allocationSize, Int initialAllocationCount, Int overflowAllocationCount);
-	
+
 	/// return the pool with the given name. if no such pool exists, return null.
 	MemoryPool *findMemoryPool(const char *poolName);
 
@@ -535,186 +533,198 @@ public:
 	/// destroy the contents of all pools and dmas. (the pools and dma's are not destroyed, just reset)
 	void reset();
 
-	void memoryPoolUsageReport( const char* filename, FILE *appendToFileInstead = NULL );
+	void memoryPoolUsageReport(const char *filename, FILE *appendToFileInstead = NULL);
 
-	#ifdef MEMORYPOOL_DEBUG
+#ifdef MEMORYPOOL_DEBUG
 
-		/// perform internal consistency checking
-		void debugMemoryVerify();
+	/// perform internal consistency checking
+	void debugMemoryVerify();
 
-		/// return true iff the block was allocated by any pool or dma owned by this factory.
-		Bool debugIsBlockInAnyPool(void *pBlock);
+	/// return true iff the block was allocated by any pool or dma owned by this factory.
+	Bool debugIsBlockInAnyPool(void *pBlock);
 
-		/// return the tag string for the block. 
-		const char *debugGetBlockTagString(void *pBlock);
+	/// return the tag string for the block.
+	const char *debugGetBlockTagString(void *pBlock);
 
-		/// dump a report with the given options to the logfile.
-		void debugMemoryReport(Int flags, Int startCheckpoint, Int endCheckpoint, FILE *fp = NULL );
+	/// dump a report with the given options to the logfile.
+	void debugMemoryReport(Int flags, Int startCheckpoint, Int endCheckpoint, FILE *fp = NULL);
 
-		void debugSetInitFillerIndex(Int index);
+	void debugSetInitFillerIndex(Int index);
 
-	#endif
-	#ifdef MEMORYPOOL_CHECKPOINTING
-		
-		/// set a new checkpoint.
-		Int debugSetCheckpoint();
+#endif
+#ifdef MEMORYPOOL_CHECKPOINTING
 
-		/// reset all checkpoint information.
-		void debugResetCheckpoints();
+	/// set a new checkpoint.
+	Int debugSetCheckpoint();
 
-	#endif
+	/// reset all checkpoint information.
+	void debugResetCheckpoints();
+
+#endif
 };
 
 // how many bytes are we allowed to 'waste' per pool allocation before the debug code starts yelling at us...
-#define MEMORY_POOL_OBJECT_ALLOCATION_SLOP	16
+#define MEMORY_POOL_OBJECT_ALLOCATION_SLOP 16
 
 // ----------------------------------------------------------------------------
-#define GCMP_FIND(ARGCLASS, ARGPOOLNAME) \
-private: \
-	static MemoryPool *getClassMemoryPool() \
-	{ \
-		/* \
-			Note that this static variable will be initialized exactly once: the first time \
-			control flows over this section of code. This allows us to neatly resolve the \
-			order-of-execution problem for static variables, ensuring this is not executed \
-			prior to the initialization of TheMemoryPoolFactory. \
-		*/ \
-		DEBUG_ASSERTCRASH(TheMemoryPoolFactory, ("TheMemoryPoolFactory is NULL\n")); \
-		static MemoryPool *The##ARGCLASS##Pool = TheMemoryPoolFactory->findMemoryPool(ARGPOOLNAME); \
-		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool, ("Pool \"%s\" not found (did you set it up in initMemoryPools?)\n", ARGPOOLNAME)); \
-		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() >= sizeof(ARGCLASS), ("Pool \"%s\" is too small for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS))); \
-		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() <= sizeof(ARGCLASS)+MEMORY_POOL_OBJECT_ALLOCATION_SLOP, ("Pool \"%s\" is too large for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS))); \
-		return The##ARGCLASS##Pool; \
-	} 
+#define GCMP_FIND(ARGCLASS, ARGPOOLNAME)                                                                                                                                                                                                                                      \
+private:                                                                                                                                                                                                                                                                      \
+	static MemoryPool *getClassMemoryPool()                                                                                                                                                                                                                                   \
+	{                                                                                                                                                                                                                                                                         \
+		/*                                                                                                                                                                                                                                                                    \
+			Note that this static variable will be initialized exactly once: the first time                                                                                                                                                                                   \
+			control flows over this section of code. This allows us to neatly resolve the                                                                                                                                                                                     \
+			order-of-execution problem for static variables, ensuring this is not executed                                                                                                                                                                                    \
+			prior to the initialization of TheMemoryPoolFactory.                                                                                                                                                                                                              \
+		*/                                                                                                                                                                                                                                                                    \
+		DEBUG_ASSERTCRASH(TheMemoryPoolFactory, ("TheMemoryPoolFactory is NULL\n"));                                                                                                                                                                                          \
+		static MemoryPool *The##ARGCLASS##Pool = TheMemoryPoolFactory->findMemoryPool(ARGPOOLNAME);                                                                                                                                                                           \
+		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool, ("Pool \"%s\" not found (did you set it up in initMemoryPools?)\n", ARGPOOLNAME));                                                                                                                                             \
+		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() >= sizeof(ARGCLASS), ("Pool \"%s\" is too small for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS)));                                      \
+		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() <= sizeof(ARGCLASS) + MEMORY_POOL_OBJECT_ALLOCATION_SLOP, ("Pool \"%s\" is too large for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS))); \
+		return The##ARGCLASS##Pool;                                                                                                                                                                                                                                           \
+	}
 
 // ----------------------------------------------------------------------------
-#define GCMP_CREATE(ARGCLASS, ARGPOOLNAME, ARGINITIAL, ARGOVERFLOW) \
-private: \
-	static MemoryPool *getClassMemoryPool() \
-	{ \
-		/* \
-			Note that this static variable will be initialized exactly once: the first time \
-			control flows over this section of code. This allows us to neatly resolve the \
-			order-of-execution problem for static variables, ensuring this is not executed \
-			prior to the initialization of TheMemoryPoolFactory. \
-		*/ \
-		DEBUG_ASSERTCRASH(TheMemoryPoolFactory, ("TheMemoryPoolFactory is NULL\n")); \
-		static MemoryPool *The##ARGCLASS##Pool = TheMemoryPoolFactory->createMemoryPool(ARGPOOLNAME, sizeof(ARGCLASS), ARGINITIAL, ARGOVERFLOW); \
-		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool, ("Pool \"%s\" not found (did you set it up in initMemoryPools?)\n", ARGPOOLNAME)); \
-		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() >= sizeof(ARGCLASS), ("Pool \"%s\" is too small for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS))); \
-		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() <= sizeof(ARGCLASS)+MEMORY_POOL_OBJECT_ALLOCATION_SLOP, ("Pool \"%s\" is too large for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS))); \
-		return The##ARGCLASS##Pool; \
-	} 
-	
+#define GCMP_CREATE(ARGCLASS, ARGPOOLNAME, ARGINITIAL, ARGOVERFLOW)                                                                                                                                                                                                           \
+private:                                                                                                                                                                                                                                                                      \
+	static MemoryPool *getClassMemoryPool()                                                                                                                                                                                                                                   \
+	{                                                                                                                                                                                                                                                                         \
+		/*                                                                                                                                                                                                                                                                    \
+			Note that this static variable will be initialized exactly once: the first time                                                                                                                                                                                   \
+			control flows over this section of code. This allows us to neatly resolve the                                                                                                                                                                                     \
+			order-of-execution problem for static variables, ensuring this is not executed                                                                                                                                                                                    \
+			prior to the initialization of TheMemoryPoolFactory.                                                                                                                                                                                                              \
+		*/                                                                                                                                                                                                                                                                    \
+		DEBUG_ASSERTCRASH(TheMemoryPoolFactory, ("TheMemoryPoolFactory is NULL\n"));                                                                                                                                                                                          \
+		static MemoryPool *The##ARGCLASS##Pool = TheMemoryPoolFactory->createMemoryPool(ARGPOOLNAME, sizeof(ARGCLASS), ARGINITIAL, ARGOVERFLOW);                                                                                                                              \
+		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool, ("Pool \"%s\" not found (did you set it up in initMemoryPools?)\n", ARGPOOLNAME));                                                                                                                                             \
+		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() >= sizeof(ARGCLASS), ("Pool \"%s\" is too small for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS)));                                      \
+		DEBUG_ASSERTCRASH(The##ARGCLASS##Pool->getAllocationSize() <= sizeof(ARGCLASS) + MEMORY_POOL_OBJECT_ALLOCATION_SLOP, ("Pool \"%s\" is too large for this class (currently %d, need %d)\n", ARGPOOLNAME, The##ARGCLASS##Pool->getAllocationSize(), sizeof(ARGCLASS))); \
+		return The##ARGCLASS##Pool;                                                                                                                                                                                                                                           \
+	}
+
 // ----------------------------------------------------------------------------
-#define MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS) \
-protected: \
-	virtual ~ARGCLASS(); \
-public: \
-	enum ARGCLASS##MagicEnum { ARGCLASS##_GLUE_NOT_IMPLEMENTED = 0 }; \
-public: \
-	inline void *operator new(size_t s, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2) \
-	{ \
+#define MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)                                                                                                                         \
+protected:                                                                                                                                                              \
+	virtual ~ARGCLASS();                                                                                                                                                \
+                                                                                                                                                                        \
+public:                                                                                                                                                                 \
+	enum ARGCLASS##MagicEnum{ARGCLASS##_GLUE_NOT_IMPLEMENTED = 0};                                                                                                      \
+                                                                                                                                                                        \
+public:                                                                                                                                                                 \
+	inline void *operator new(size_t s, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2)                                                                               \
+	{                                                                                                                                                                   \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \
-		return ARGCLASS::getClassMemoryPool()->allocateBlockImplementation(PASS_LITERALSTRING_ARG1); \
-	} \
-public: \
-	/* \
-		Note that this delete operator can't be called directly; it is called \
-		only if the analogous new operator is called, AND the constructor \
-		throws an exception... \
-	*/ \
-	inline void operator delete(void *p, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2) \
-	{ \
-		ARGCLASS::getClassMemoryPool()->freeBlock(p); \
-	} \
-protected: \
-	/* \
-		Make normal new and delete protected, so they can't be called by the outside world. \
-		Note that delete is funny, in that it can still be called by the class itself; \
-		this is safe but not recommended, for consistency purposes. More problematically, \
-		it can be called by another class that has declared itself 'friend' to us. \
-		In theory, this shouldn't work, since it may not use the right operator-delete, \
-		and thus the wrong memory pool; in practice, it seems the right delete IS called \
-		in MSVC -- it seems to make operator delete virtual if the destructor is also virtual. \
-		At any rate, this is undocumented behavior as far as I can tell, so we put a big old \
-		crash into operator delete telling people to do the right thing and call deleteInstance \
-		instead -- it'd be nice if we could catch this at compile time, but catching it at \
-		runtime seems to be the best we can do... \
-	*/ \
-	inline void *operator new(size_t s) \
-	{ \
-		DEBUG_CRASH(("This operator new should normally never be called... please use new(char*) instead.")); \
+		return ARGCLASS::getClassMemoryPool()->allocateBlockImplementation(PASS_LITERALSTRING_ARG1);                                                                    \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+public:                                                                                                                                                                 \
+	/*                                                                                                                                                                  \
+		Note that this delete operator can't be called directly; it is called                                                                                           \
+		only if the analogous new operator is called, AND the constructor                                                                                               \
+		throws an exception...                                                                                                                                          \
+	*/                                                                                                                                                                  \
+	inline void operator delete(void *p, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2)                                                                              \
+	{                                                                                                                                                                   \
+		ARGCLASS::getClassMemoryPool()->freeBlock(p);                                                                                                                   \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+protected:                                                                                                                                                              \
+	/*                                                                                                                                                                  \
+		Make normal new and delete protected, so they can't be called by the outside world.                                                                             \
+		Note that delete is funny, in that it can still be called by the class itself;                                                                                  \
+		this is safe but not recommended, for consistency purposes. More problematically,                                                                               \
+		it can be called by another class that has declared itself 'friend' to us.                                                                                      \
+		In theory, this shouldn't work, since it may not use the right operator-delete,                                                                                 \
+		and thus the wrong memory pool; in practice, it seems the right delete IS called                                                                                \
+		in MSVC -- it seems to make operator delete virtual if the destructor is also virtual.                                                                          \
+		At any rate, this is undocumented behavior as far as I can tell, so we put a big old                                                                            \
+		crash into operator delete telling people to do the right thing and call deleteInstance                                                                         \
+		instead -- it'd be nice if we could catch this at compile time, but catching it at                                                                              \
+		runtime seems to be the best we can do...                                                                                                                       \
+	*/                                                                                                                                                                  \
+	inline void *operator new(size_t s)                                                                                                                                 \
+	{                                                                                                                                                                   \
+		DEBUG_CRASH(("This operator new should normally never be called... please use new(char*) instead."));                                                           \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \
-		throw ERROR_BUG; \
-		return 0; \
-	} \
-	inline void operator delete(void *p) \
-	{ \
-		DEBUG_CRASH(("Please call deleteInstance instead of delete.")); \
-		ARGCLASS::getClassMemoryPool()->freeBlock(p); \
-	} \
-private: \
-	virtual MemoryPool *getObjectMemoryPool() \
-	{ \
-		return ARGCLASS::getClassMemoryPool(); \
-	} \
-public: /* include this line at the end to reset visibility to 'public' */ 
+		throw ERROR_BUG;                                                                                                                                                \
+		return 0;                                                                                                                                                       \
+	}                                                                                                                                                                   \
+	inline void operator delete(void *p)                                                                                                                                \
+	{                                                                                                                                                                   \
+		DEBUG_CRASH(("Please call deleteInstance instead of delete."));                                                                                                 \
+		ARGCLASS::getClassMemoryPool()->freeBlock(p);                                                                                                                   \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+private:                                                                                                                                                                \
+	virtual MemoryPool *getObjectMemoryPool()                                                                                                                           \
+	{                                                                                                                                                                   \
+		return ARGCLASS::getClassMemoryPool();                                                                                                                          \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+public: /* include this line at the end to reset visibility to 'public' */
 
 // ----------------------------------------------------------------------------
 #define MEMORY_POOL_GLUE(ARGCLASS, ARGPOOLNAME) \
-	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS) \
+	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)     \
 	GCMP_FIND(ARGCLASS, ARGPOOLNAME)
 
 // ----------------------------------------------------------------------------
 #define MEMORY_POOL_GLUE_WITH_EXPLICIT_CREATE(ARGCLASS, ARGPOOLNAME, ARGINITIAL, ARGOVERFLOW) \
-	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS) \
+	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)                                                   \
 	GCMP_CREATE(ARGCLASS, ARGPOOLNAME, ARGINITIAL, ARGOVERFLOW)
 
 // ----------------------------------------------------------------------------
 #define MEMORY_POOL_GLUE_WITH_USERLOOKUP_CREATE(ARGCLASS, ARGPOOLNAME) \
-	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS) \
+	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)                            \
 	GCMP_CREATE(ARGCLASS, ARGPOOLNAME, -1, -1)
 
 // ----------------------------------------------------------------------------
 // this is the version for an Abstract Base Class, which will never be instantiated...
-#define MEMORY_POOL_GLUE_ABC(ARGCLASS) \
-protected: \
-	virtual ~ARGCLASS(); \
-public: \
-	enum ARGCLASS##MagicEnum { ARGCLASS##_GLUE_NOT_IMPLEMENTED = 0 }; \
-protected: \
-	inline void *operator new(size_t s, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2) \
-	{ \
-		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
+#define MEMORY_POOL_GLUE_ABC(ARGCLASS)                                                                                                                                  \
+protected:                                                                                                                                                              \
+	virtual ~ARGCLASS();                                                                                                                                                \
+                                                                                                                                                                        \
+public:                                                                                                                                                                 \
+	enum ARGCLASS##MagicEnum{ARGCLASS##_GLUE_NOT_IMPLEMENTED = 0};                                                                                                      \
+                                                                                                                                                                        \
+protected:                                                                                                                                                              \
+	inline void *operator new(size_t s, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2)                                                                               \
+	{                                                                                                                                                                   \
+		DEBUG_CRASH(("this should be impossible to call (abstract base class)"));                                                                                       \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \
-		throw ERROR_BUG; \
-		return 0; \
-	} \
-protected: \
-	inline void operator delete(void *p, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2) \
-	{ \
-		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
-	} \
-protected: \
-	inline void *operator new(size_t s) \
-	{ \
-		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
+		throw ERROR_BUG;                                                                                                                                                \
+		return 0;                                                                                                                                                       \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+protected:                                                                                                                                                              \
+	inline void operator delete(void *p, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2)                                                                              \
+	{                                                                                                                                                                   \
+		DEBUG_CRASH(("this should be impossible to call (abstract base class)"));                                                                                       \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+protected:                                                                                                                                                              \
+	inline void *operator new(size_t s)                                                                                                                                 \
+	{                                                                                                                                                                   \
+		DEBUG_CRASH(("this should be impossible to call (abstract base class)"));                                                                                       \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \
-		throw ERROR_BUG; \
-		return 0; \
-	} \
-	inline void operator delete(void *p) \
-	{ \
-		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
-	} \
-private: \
-	virtual MemoryPool *getObjectMemoryPool() \
-	{ \
-		throw ERROR_BUG; \
-		return 0; \
-	} \
-public: /* include this line at the end to reset visibility to 'public' */ 
+		throw ERROR_BUG;                                                                                                                                                \
+		return 0;                                                                                                                                                       \
+	}                                                                                                                                                                   \
+	inline void operator delete(void *p)                                                                                                                                \
+	{                                                                                                                                                                   \
+		DEBUG_CRASH(("this should be impossible to call (abstract base class)"));                                                                                       \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+private:                                                                                                                                                                \
+	virtual MemoryPool *getObjectMemoryPool()                                                                                                                           \
+	{                                                                                                                                                                   \
+		throw ERROR_BUG;                                                                                                                                                \
+		return 0;                                                                                                                                                       \
+	}                                                                                                                                                                   \
+                                                                                                                                                                        \
+public: /* include this line at the end to reset visibility to 'public' */
 
 // ----------------------------------------------------------------------------
 /**
@@ -722,11 +732,13 @@ public: /* include this line at the end to reset visibility to 'public' */
 	be destroyed under special circumstances. MemoryPoolObject short-circuits this
 	by making the destructor always be protected, and the true delete technique
 	(namely, deleteInstance) always public by default. You can simulate the behavior
-	you really want by including this macro 
+	you really want by including this macro
 */
-#define MEMORY_POOL_DELETEINSTANCE_VISIBILITY(ARGVIS)\
-ARGVIS:	void deleteInstance() { MemoryPoolObject::deleteInstance(); } public: 
-
+#define MEMORY_POOL_DELETEINSTANCE_VISIBILITY(ARGVIS)             \
+	ARGVIS:                                                       \
+	void deleteInstance() { MemoryPoolObject::deleteInstance(); } \
+                                                                  \
+public:
 
 // ----------------------------------------------------------------------------
 /**
@@ -739,29 +751,30 @@ ARGVIS:	void deleteInstance() { MemoryPoolObject::deleteInstance(); } public:
 class MemoryPoolObject
 {
 protected:
-
 	/** ensure that all destructors are virtual */
-	virtual ~MemoryPoolObject() { }
+	virtual ~MemoryPoolObject() {}
 
-protected: 
-	inline void *operator new(size_t s) { DEBUG_CRASH(("This should be impossible")); return 0; }
+protected:
+	inline void *operator new(size_t s) noexcept
+	{
+		DEBUG_CRASH(("This should be impossible"));
+		return 0;
+	}
 	inline void operator delete(void *p) { DEBUG_CRASH(("This should be impossible")); }
 
-protected: 
-
+protected:
 	virtual MemoryPool *getObjectMemoryPool() = 0;
-	
-public: 
 
-	void deleteInstance() 
-	{	
+public:
+	void deleteInstance()
+	{
 		if (this)
 		{
 			MemoryPool *pool = this->getObjectMemoryPool(); // save this, since the dtor will nuke our vtbl
-			this->~MemoryPoolObject();	// it's virtual, so the right one will be called.
-			pool->freeBlock((void *)this); 
+			this->~MemoryPoolObject();						// it's virtual, so the right one will be called.
+			pool->freeBlock((void *)this);
 		}
-	} 
+	}
 };
 
 // ----------------------------------------------------------------------------
@@ -773,13 +786,17 @@ class MemoryPoolObjectHolder
 {
 private:
 	MemoryPoolObject *m_mpo;
+
 public:
-	MemoryPoolObjectHolder(MemoryPoolObject *mpo = NULL) : m_mpo(mpo) { }
-	void hold(MemoryPoolObject *mpo) { DEBUG_ASSERTCRASH(!m_mpo, ("already holding")); m_mpo = mpo; }
+	MemoryPoolObjectHolder(MemoryPoolObject *mpo = NULL) : m_mpo(mpo) {}
+	void hold(MemoryPoolObject *mpo)
+	{
+		DEBUG_ASSERTCRASH(!m_mpo, ("already holding"));
+		m_mpo = mpo;
+	}
 	void release() { m_mpo = NULL; }
 	~MemoryPoolObjectHolder() { m_mpo->deleteInstance(); }
 };
-
 
 // INLINING ///////////////////////////////////////////////////////////////////
 
@@ -800,9 +817,9 @@ inline DynamicMemoryAllocator *DynamicMemoryAllocator::getNextDmaInList() { retu
 // EXTERNALS //////////////////////////////////////////////////////////////////
 
 /**
-	Initialize the memory manager. Construct a new MemoryPoolFactory and 
+	Initialize the memory manager. Construct a new MemoryPoolFactory and
 	DynamicMemoryAllocator and store 'em in the singletons of the relevant
-	names. 
+	names.
 */
 extern void initMemoryManager();
 
@@ -824,7 +841,7 @@ extern Bool isMemoryManagerOfficiallyInited();
 /* extern void preMainInitMemoryManager(); */
 
 /**
-	Shut down the memory manager. Throw away TheMemoryPoolFactory and 
+	Shut down the memory manager. Throw away TheMemoryPoolFactory and
 	TheDynamicMemoryAllocator.
 */
 extern void shutdownMemoryManager();
@@ -836,7 +853,7 @@ extern DynamicMemoryAllocator *TheDynamicMemoryAllocator;
 	This function is declared in this header, but is not defined anywhere -- you must provide
 	it in your code. It is called by initMemoryManager() or preMainInitMemoryManager() in order
 	to get the specifics of the subpool for the dynamic memory allocator. (If you just want
-	some defaults, set both return arguments to zero.) The reason for this odd setup is that 
+	some defaults, set both return arguments to zero.) The reason for this odd setup is that
 	we may need to init the memory manager prior to main() [due to static C++ ctors] and
 	this allows us a way to get the necessary parameters.
 */
@@ -851,55 +868,56 @@ extern void userMemoryManagerInitPools();
 
 /**
 	This function is declared in this header, but is not defined anywhere -- you must provide
-	it in your code. It is called by createMemoryPool to adjust the allocation size(s) for a 
+	it in your code. It is called by createMemoryPool to adjust the allocation size(s) for a
 	given pool. Note that the counts are in-out parms!
 */
-extern void userMemoryAdjustPoolSize(const char *poolName, Int& initialAllocationCount, Int& overflowAllocationCount);
+extern void userMemoryAdjustPoolSize(const char *poolName, Int &initialAllocationCount, Int &overflowAllocationCount);
 
 #ifdef __cplusplus
 
 #ifndef _OPERATOR_NEW_DEFINED_
 
-	#define _OPERATOR_NEW_DEFINED_
+#define _OPERATOR_NEW_DEFINED_
 
-	extern void * __cdecl operator new		(size_t size);
-	extern void __cdecl operator delete		(void *p);
+// extern void *__cdecl operator new(size_t size);
+// extern void __cdecl operator delete(void *p);
 
-	extern void * __cdecl operator new[]	(size_t size);
-	extern void __cdecl operator delete[]	(void *p);
+// extern void *__cdecl operator new[](size_t size);
+// extern void __cdecl operator delete[](void *p);
 
-	// additional overloads to account for VC/MFC funky versions
-	extern void* __cdecl operator new(size_t nSize, const char *, int);
-	extern void __cdecl operator delete(void *, const char *, int);
+// // additional overloads to account for VC/MFC funky versions
+// extern void *__cdecl operator new(size_t nSize, const char *, int);
+// extern void __cdecl operator delete(void *, const char *, int);
 
-	extern void* __cdecl operator new[](size_t nSize, const char *, int);
-	extern void __cdecl operator delete[](void *, const char *, int);
+// extern void *__cdecl operator new[](size_t nSize, const char *, int);
+// extern void __cdecl operator delete[](void *, const char *, int);
 
-	// additional overloads for 'placement new'
-	//inline void* __cdecl operator new							(size_t s, void *p) { return p; }
-	//inline void __cdecl operator delete						(void *, void *p)		{ }
-	inline void* __cdecl operator new[]						(size_t s, void *p) { return p; }
-	inline void __cdecl operator delete[]					(void *, void *p)		{ }
+// // additional overloads for 'placement new'
+// // inline void* __cdecl operator new							(size_t s, void *p) { return p; }
+// // inline void __cdecl operator delete						(void *, void *p)		{ }
+// inline void *__cdecl operator new[](size_t s, void *p) { return p; }
+// inline void __cdecl operator delete[](void *, void *p) {}
 
 #endif
 
 #ifdef MEMORYPOOL_DEBUG_CUSTOM_NEW
-	#define MSGNEW(MSG)		new(MSG, 0)
-	#define NEW						new(__FILE__, __LINE__)
+#define MSGNEW(MSG) new (MSG, 0)
+#define NEW new (__FILE__, __LINE__)
 #else
-	#define MSGNEW(MSG)		new
-	#define NEW						new
+#define MSGNEW(MSG) new
+#define NEW new
 #endif
 
 #endif
 
-class STLSpecialAlloc 
+class STLSpecialAlloc
 {
 public:
-	static void* allocate(size_t __n);
-	static void deallocate(void* __p, size_t);
+	static void *allocate(size_t __n);
+	static void deallocate(void *__p, size_t);
 };
 
-#define EMPTY_DTOR(CLASS) inline CLASS::~CLASS() { }
+#define EMPTY_DTOR(CLASS) \
+	inline CLASS::~CLASS() {}
 
 #endif // _GAME_MEMORY_H_
