@@ -5,10 +5,12 @@ add_library(compiler_flags INTERFACE)
 target_compile_features(compiler_flags INTERFACE cxx_std_23)
 
 
-add_subdirectory(Code)
+add_subdirectory(src)
 
-add_executable(Generals.exe main.cpp)
-target_link_libraries(Generals.exe GameEngine)
+add_executable(Generals.exe src/main.cpp)
+target_link_libraries(Generals.exe compiler_flags GameEngine GLAD GLFW)
+
+
 # include(CTest)
 # enable_testing()
 
