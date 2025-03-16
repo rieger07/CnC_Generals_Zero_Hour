@@ -8,7 +8,7 @@ target_compile_features(compiler_flags INTERFACE cxx_std_23)
 add_subdirectory(src)
 
 add_executable(Generals.exe src/main.cpp)
-target_link_libraries(Generals.exe compiler_flags GameEngine GLAD GLFW)
+target_link_libraries(Generals.exe PUBLIC compiler_flags GLAD glfw imgui imgui_impl_glfw imgui_impl_opengl3)
 
 
 # include(CTest)
